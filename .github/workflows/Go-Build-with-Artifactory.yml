@@ -55,14 +55,12 @@ jobs:
       #- name: Audit Source Code
       #  run: |
       #    jf audit --licenses --format=table --gradle=true
-      -
-        name: Build package
+      
+      - name: Build package
         run: |
           jf go build --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
           
-      -
-        name: Publish build with info
-        if: github.ref == 'refs/heads/main'
+      - name: Publish build with info
         run: |
           jf go-publish v1.0.0 --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
           # Collect environment variables for the build
