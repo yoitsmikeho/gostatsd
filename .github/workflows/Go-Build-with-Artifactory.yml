@@ -1,0 +1,78 @@
+name: Go Build gostatd App with JFrog Artifactory
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  actions: read           # for detecting the Github Actions environment
+  id-token: write         # for creating OIDC tokens for signing
+  packages: write         # for uploading attestations
+  contents: read          # read the contents permission
+  security-events: write  # for uploading code scanning
+
+jobs:
+  build:
+    name: 'Build gostatd'
+    env:
+      JFROG_CLI_BUILD_NAME: 'gostatd-go'
+      JFROG_CLI_BUILD_NUMBER: ${{ github.run_number }}
+      JFROG_CLI_BUILD_PROJECT: ${{ vars.JF_PROJECT }}
+      JFROG_CLI_LOG_LEVEL: INFO
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          # Go version needs to be the same in: CI config, README, Dockerfiles, and Makefile
+          go-version: 1.21.4
+      
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: https://${{ vars.JF_URL }}/
+        with:
+          oidc-provider-name: mikeho-github
+          oidc-audience: mikeho-audience
+          
+      - name: Configure Build
+        run: |
+          jf go-config --repo-resolve=mikeho-gostat-app-go-remote --repo-deploy=mikeho-gostat-app-go-local
+          
+      #- name: JFrog Curation Audit
+      #  run: |
+      #    jf mvn-config --repo-resolve-releases mikeho-petclinic-gradle-remote --repo-resolve-snapshots mikeho-petclinic-gradle-remote --repo-deploy-releases mikeho-petclinic-gradle-release-local --repo-deploy-snapshots mikeho-petclinic-gradle-dev-local
+      #    echo "petclinicArtifactName=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_ENV
+      #    echo "petclinicVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+      #    jf curation-audit
+      #- name: Audit Source Code
+      #  run: |
+      #    jf audit --licenses --format=table --gradle=true
+      -
+        name: Build package
+        run: |
+          jf go build --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
+          
+      -
+        name: Publish build with info
+        if: github.ref == 'refs/heads/main'
+        run: |
+          jf go-publish v1.0.0 --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
+          # Collect environment variables for the build
+          jf rt bce --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project ${{ env.JFROG_CLI_BUILD_PROJECT }} 
+          # Collect VCS details from Git and add them to the build
+          jf rt bag --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project ${{ env.JFROG_CLI_BUILD_PROJECT }}
+          jf rt build-publish --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
+      
+      #- name: Scan build
+      #  if: github.ref == 'refs/heads/main'
+      #  run: |
+      #    jf build-scan --vuln --fail=false --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }} 
+     
