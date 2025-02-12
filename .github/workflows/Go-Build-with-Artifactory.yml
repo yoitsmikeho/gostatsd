@@ -46,15 +46,12 @@ jobs:
         run: |
           jf go-config --repo-resolve=mikeho-gostat-app-go --repo-deploy=mikeho-gostat-app-go-local
           
-      #- name: JFrog Curation Audit
-      #  run: |
-      #    jf mvn-config --repo-resolve-releases mikeho-petclinic-gradle-remote --repo-resolve-snapshots mikeho-petclinic-gradle-remote --repo-deploy-releases mikeho-petclinic-gradle-release-local --repo-deploy-snapshots mikeho-petclinic-gradle-dev-local
-      #    echo "petclinicArtifactName=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_ENV
-      #    echo "petclinicVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-      #    jf curation-audit
-      #- name: Audit Source Code
-      #  run: |
-      #    jf audit --licenses --format=table --gradle=true
+      - name: JFrog Curation Audit
+        run: |
+          jf curation-audit
+      - name: Audit Source Code
+        run: |
+          jf audit --licenses --format=table --go=true
       
       - name: Build package
         run: |
@@ -69,8 +66,7 @@ jobs:
           # jf rt build-add-git --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
           jf rt build-publish --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
       
-      #- name: Scan build
-      #  if: github.ref == 'refs/heads/main'
-      #  run: |
-      #    jf build-scan --vuln --fail=false --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }} 
+      - name: Scan build
+        run: |
+          jf build-scan --vuln --fail=false --project=${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}  
      
