@@ -2,9 +2,9 @@ name: Go Build gostatsd App with JFrog Artifactory
 
 on:
   push:
-    branches: [ main ]
+    branches: [ OBD-1888-remove-healthyhostcount-alarm ]
   pull_request:
-    branches: [ main ]
+    branches: [ OBD-1888-remove-healthyhostcount-alarm ]
   workflow_dispatch:
 
 permissions:
@@ -44,7 +44,7 @@ jobs:
           
       - name: Configure Build
         run: |
-          jf go-config --repo-resolve=mikeho-gostat-app-go-remote --repo-deploy=mikeho-gostat-app-go-local
+          jf go-config --repo-resolve=mikeho-gostat-app-go --repo-deploy=mikeho-gostat-app-go-local
           
       #- name: JFrog Curation Audit
       #  run: |
@@ -67,7 +67,7 @@ jobs:
           # jf rt build-collect-env --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}  
           # Collect VCS details from Git and add them to the build
           # jf rt build-add-git --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
-          jf rt build-publish --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
+          jf rt build-publish --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
       
       #- name: Scan build
       #  if: github.ref == 'refs/heads/main'
