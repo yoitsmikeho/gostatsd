@@ -69,6 +69,7 @@ jobs:
           jf rt build-add-git --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
           #jf rt build-publish --project ${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
           jf go-publish --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }} v1.1.0
+          sleep 20s
 
       - name: Upload output to generate autofix
         uses: github/codeql-action/upload-sarif@v3
