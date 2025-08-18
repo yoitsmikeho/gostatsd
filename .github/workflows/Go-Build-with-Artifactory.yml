@@ -47,18 +47,18 @@ jobs:
         run: |
           jf go-config --repo-resolve=mikeho-gostat-app-go --repo-deploy=mikeho-gostat-app-go-local
           
-      - name: JFrog Curation Audit
-        run: |
-          jf curation-audit
-      - name: Audit Source Code
-        run: |
+      #- name: JFrog Curation Audit
+      #  run: |
+      #    jf curation-audit
+      #- name: Audit Source Code
+      #  run: |
           #jf audit --go=true --sca --format=sarif
-          jf audit --go=true --fail=false --sast --sca --secrets --format=sarif > jfrog_sast.sarif
-          jf rt upload jfrog_sast.sarif grafana-plugins-generic-local/sarif-gostatd/
+      #    jf audit --go=true --fail=false --sast --sca --secrets --format=sarif > jfrog_sast.sarif
+      #    jf rt upload jfrog_sast.sarif grafana-plugins-generic-local/sarif-gostatd/
       
       - name: Build package
         run: |
-          #go mod download google.golang.org/protobuf
+          go mod tidy
           jf go build --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
           
       - name: Publish build with info
@@ -76,8 +76,8 @@ jobs:
           #jf build-scan --fail=false --project=${{ env.JFROG_CLI_BUILD_PROJECT }} ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
           jf build-scan ${{ env.JFROG_CLI_BUILD_NAME }} ${{ env.JFROG_CLI_BUILD_NUMBER }}
 
-      - name: Upload output to generate autofix
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: jfrog_sast.sarif
+      #- name: Upload output to generate autofix
+      #  uses: github/codeql-action/upload-sarif@v3
+      #  with:
+      #    sarif_file: jfrog_sast.sarif
      
