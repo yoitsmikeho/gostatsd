@@ -53,7 +53,7 @@ jobs:
       - name: Audit Source Code
         run: |
           #jf audit --go=true --sca --format=sarif
-          jf audit --go=true --fail=false --sast --sca --secrets --watches=yoitsmikeho-watch --format=sarif > jfrog_sast.sarif
+          jf audit --go=true --fail=false --sast --sca --secrets --watches="yoitsmikeho-watch" --format=sarif > jfrog_sast.sarif
           jf rt upload jfrog_sast.sarif grafana-plugins-generic-local/sarif-gostatd/
       
       - name: Build package
