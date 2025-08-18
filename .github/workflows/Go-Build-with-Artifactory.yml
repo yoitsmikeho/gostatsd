@@ -45,7 +45,7 @@ jobs:
           
       - name: Configure Build
         run: |
-          jf go-config --repo-resolve=mikeho-gostat-app-go --repo-deploy=mikeho-gostat-app-go-local --project=yoitsmikeho
+          jf go-config --repo-resolve=mikeho-gostat-app-go --repo-deploy=mikeho-gostat-app-go-local
           
       - name: JFrog Curation Audit
         run: |
