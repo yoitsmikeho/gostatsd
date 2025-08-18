@@ -58,6 +58,7 @@ jobs:
       
       - name: Build package
         run: |
+          go mod download google.golang.org/protobuf
           jf go build --build-name=${{ env.JFROG_CLI_BUILD_NAME }} --build-number=${{ env.JFROG_CLI_BUILD_NUMBER }} --project=${{ env.JFROG_CLI_BUILD_PROJECT }}
           
       - name: Publish build with info
