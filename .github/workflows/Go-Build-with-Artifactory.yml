@@ -41,12 +41,12 @@ jobs:
         with:
           oidc-provider-name: mikeho-github
           oidc-audience: mikeho-audience
-          version: 2.78.5
+          version: 2.78.6
 
       - name: Test connectivity
         run: |
           jf rt ping
-          jf rt ping --url "https://soleng.jfrog.io" --access-token ${{ secrets.JF_ACCESS_TOKEN }}
+          jf rt ping --url "https://soleng.jfrog.io/artifactory" --access-token ${{ secrets.JF_ACCESS_TOKEN }}
           
       - name: Configure Build
         run: |
